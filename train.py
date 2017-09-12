@@ -35,7 +35,7 @@ tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (d
 # Misc Parameters
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
 tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
-tf.flags.Define_integer("max_iterations", 10000, "Max number of training iterations")
+tf.flags.DEFINE_integer("max_iterations", 10000, "Max number of training iterations")
 
 
 FLAGS = tf.flags.FLAGS
@@ -59,9 +59,6 @@ y_shuffled = y[shuffle_indices]
 dev_sample_index = -1 * int(FLAGS.dev_sample_percentage * float(len(y)))
 x_train, x_dev = x_shuffled[:dev_sample_index], x_shuffled[dev_sample_index:]
 y_train, y_dev = y_shuffled[:dev_sample_index], y_shuffled[dev_sample_index:]
-
-print(x_train)
-
 
 # Training
 with tf.Graph().as_default():
