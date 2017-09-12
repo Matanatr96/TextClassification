@@ -3,14 +3,15 @@
 import tensorflow as tf
 import numpy as np
 import os
+import sys
 import time
 import datetime
 import data_helpers
 from text_cnn import TextCNN
 from tensorflow.contrib import learn
+from tensorflow.python.saved_model import builder as saved_model_builder
 
-# Parameters
-# ==================================================
+
 
 # Data loading params
 tf.flags.DEFINE_float("dev_sample_percentage", .1, "Percentage of the training data to use for validation")
@@ -143,3 +144,13 @@ with tf.Graph().as_default():
             x_batch, y_batch = zip(*batch)
             train_step(x_batch, y_batch)
             current_step = tf.train.global_step(sess, global_step)
+
+        export_path_base = sys.argv[-1]
+        export_path = os.path.join(
+            tf.compat.as_bytes(export_path_base),
+            tf.compat.as_bytes(str(FLAGS.model_version)))
+        print('Exporting trained model to', export_path)
+        builder = saved_model_builder.SavedModelBuilder(export_path)
+        builder.add_meta_graph_and_variables(
+            sess,)
+        builder.save()
