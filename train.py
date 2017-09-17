@@ -3,7 +3,6 @@
 import tensorflow as tf
 import numpy as np
 import os
-import sys
 import time
 import datetime
 import data_helpers
@@ -111,7 +110,7 @@ with tf.Graph().as_default():
         dev_summary_dir = os.path.join(out_dir, "summaries", "dev")
         dev_summary_writer = tf.summary.FileWriter(dev_summary_dir, sess.graph)
 
-        # Checkpoint directory. Tensorflow assumes this directory already exists so we need to create it
+        # Checkpoint directory
         checkpoint_dir = os.path.abspath(os.path.join(out_dir, "checkpoints"))
         checkpoint_prefix = os.path.join(checkpoint_dir, "model")
         if not os.path.exists(checkpoint_dir):
@@ -125,9 +124,6 @@ with tf.Graph().as_default():
         sess.run(tf.global_variables_initializer())
 
         def train_step(x_batch, y_batch):
-            """
-            A single training step
-            """
             feed_dict = {
               cnn.input_x: x_batch,
               cnn.input_y: y_batch,
