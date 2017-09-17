@@ -95,7 +95,7 @@ with tf.Graph().as_default():
         # Output directory for models and summaries
         timestamp = str(int(time.time()))
         out_dir = os.path.abspath(os.path.join(os.path.curdir, "runs", timestamp))
-        print("Run # {}\n".format(out_dir))
+        print("Writing to {}\n".format(out_dir))
 
         # Summaries for loss and accuracy
         loss_summary = tf.summary.scalar("loss", cnn.loss)
@@ -111,6 +111,7 @@ with tf.Graph().as_default():
         dev_summary_dir = os.path.join(out_dir, "summaries", "dev")
         dev_summary_writer = tf.summary.FileWriter(dev_summary_dir, sess.graph)
 
+        # Checkpoint directory. Tensorflow assumes this directory already exists so we need to create it
         checkpoint_dir = os.path.abspath(os.path.join(out_dir, "checkpoints"))
         checkpoint_prefix = os.path.join(checkpoint_dir, "model")
         if not os.path.exists(checkpoint_dir):
@@ -123,8 +124,10 @@ with tf.Graph().as_default():
         # Initialize all variables
         sess.run(tf.global_variables_initializer())
 
-        #Training Iteration
         def train_step(x_batch, y_batch):
+            """
+            A single training step
+            """
             feed_dict = {
               cnn.input_x: x_batch,
               cnn.input_y: y_batch,
@@ -133,8 +136,23 @@ with tf.Graph().as_default():
             _, step, summaries, loss, accuracy = sess.run(
                 [train_op, global_step, train_summary_op, cnn.loss, cnn.accuracy],
                 feed_dict)
-            print("Step {}, loss {:g}, acc {:g}".format(step, loss, accuracy))
+            time_str = datetime.datetime.now().isoformat()
+            print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
             train_summary_writer.add_summary(summaries, step)
+
+        def dev_step(x_batch, y_batch, writer=None):
+            feed_dict = {
+              cnn.input_x: x_batch,
+              cnn.input_y: y_batch,
+              cnn.dropout_keep_prob: 1.0
+            }
+            step, summaries, loss, accuracy = sess.run(
+                [global_step, dev_summary_op, cnn.loss, cnn.accuracy],
+                feed_dict)
+            time_str = datetime.datetime.now().isoformat()
+            print("{}: step {}, loss {:g}, acc {:g}".format(time_str, step, loss, accuracy))
+            # if writer:
+            #     writer.add_summary(summaries, step)
 
         # Generate batches
         batches = data_helpers.batch_iter(
@@ -145,14 +163,5 @@ with tf.Graph().as_default():
             train_step(x_batch, y_batch)
             current_step = tf.train.global_step(sess, global_step)
             if current_step == FLAGS.max_iterations:
-                break
-
-        export_path_base = sys.argv[-1]
-        export_path = os.path.join(
-            tf.compat.as_bytes(export_path_base),
-            tf.compat.as_bytes(str(FLAGS.model_version)))
-        print('Exporting trained model to', export_path)
-        builder = saved_model_builder.SavedModelBuilder(export_path)
-        builder.add_meta_graph_and_variables(
-            sess,)
-        builder.save()
+                path = saver.save(sess, checkpoint_prefix, global_step=current_step)
+                print("Model saved to {}\n".format(path))
