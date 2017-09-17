@@ -1,5 +1,6 @@
 *.npy
 runs/
+.idea/workspace.xml
 
 # Created by https://www.gitignore.io/api/python,ipythonnotebook
 
@@ -28,7 +29,7 @@ sdist/
 var/
 *.egg-info/
 .installed.cfg
-*.egg
+
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
