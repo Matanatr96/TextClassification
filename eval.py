@@ -39,8 +39,8 @@ if FLAGS.eval_train:
     x_raw, y_test = data_helpers.load_data_and_labels(FLAGS.positive_data_file, FLAGS.negative_data_file)
     y_test = np.argmax(y_test, axis=1)
 else:
-    x_raw = ["Karthik is a little bitch", "Smite is the best game in the world"]
-    y_test = [1, 0]
+    x_raw = ["3600 is an easy class", "Karthik is a little bitch", "Anush is honestly a great person"]
+    y_test = [1, 0, 1]
 
 # Map data into vocabulary
 vocab_path = os.path.join(FLAGS.checkpoint_dir, '..' ,"vocab")
