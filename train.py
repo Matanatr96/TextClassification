@@ -161,3 +161,4 @@ with tf.Graph().as_default():
             if current_step == FLAGS.max_iterations:
                 path = saver.save(sess, checkpoint_prefix, global_step=current_step)
                 print("Model saved to {}\n".format(path))
+                break
