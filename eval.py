@@ -10,34 +10,17 @@ from text_cnn import TextCNN
 from tensorflow.contrib import learn
 import csv
 
-def runAnalysis(x_raw = ["Anush is honestly a great person"]):
-    # Data Parameters
-    tf.flags.DEFINE_string("positive_data_file", "./data/rt-polaritydata/rt-polarity.pos",
-                           "Data source for the positive data.")
-    tf.flags.DEFINE_string("negative_data_file", "./data/rt-polaritydata/rt-polarity.neg",
-                           "Data source for the positive data.")
-
-    # Eval Parameters
+def runAnalysis(x_raw = ["Anush is honestly a great person"], y_test = None):
     tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
     tf.flags.DEFINE_string("checkpoint_dir", ".\\runs\\1508178059\\checkpoints", "Checkpoint directory from training run")
-    tf.flags.DEFINE_boolean("eval_train", False, "Evaluate on all training data")
-
-    # Misc Parameters
     tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
     tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
 
     FLAGS = tf.flags.FLAGS
     FLAGS._parse_flags()
-    print("\nParameters:")
-    for attr, value in sorted(FLAGS.__flags.items()):
-        print("{}={}".format(attr.upper(), value))
-    print("")
 
-    # CHANGE THIS: Load data. Load your own data here
-    if FLAGS.eval_train:
-        x_raw, y_test = data_helpers.load_data_and_labels(FLAGS.positive_data_file, FLAGS.negative_data_file)
-        y_test = np.argmax(y_test, axis=1)
-    else:
+    #y_test = np.argmax(y_test, axis=1)
+    if not y_test:
         y_test = [1]
 
     # Map data into vocabulary
@@ -48,7 +31,6 @@ def runAnalysis(x_raw = ["Anush is honestly a great person"]):
     print("\nEvaluating...\n")
 
     # Evaluation
-    # ==================================================
     checkpoint_file = tf.train.latest_checkpoint(FLAGS.checkpoint_dir)
     graph = tf.Graph()
     with graph.as_default():
