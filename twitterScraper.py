@@ -23,11 +23,13 @@ def parseArguments():
 if __name__ == "__main__":
     tweets = []
     print('Running Eval...\n')
-
     number, hashtag = parseArguments()
+
     for tweet in query_tweets(hashtag, number)[:number]:
         tweets.append(format(tweet.text))
 
     # y_test = np.full(len(tweets), 1)
-    eval.runAnalysis(tweets)
+
+    twitterAnalysis = eval.TwitterAnalysis(tweets, hashtag)
+    twitterAnalysis.runAnalysis()
 
