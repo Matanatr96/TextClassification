@@ -10,7 +10,11 @@ from text_cnn import TextCNN
 from tensorflow.contrib import learn
 import csv
 
-def runAnalysis(x_raw = ["Anush is honestly a great person"], y_test = None):
+def printAnalysis(predictions):
+    average = np.mean(predictions)
+    print('Average Sentiment Score: {}'.format(average))
+
+def runAnalysis(x_raw, y_test = None):
     tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
     tf.flags.DEFINE_string("checkpoint_dir", ".\\runs\\1508178059\\checkpoints", "Checkpoint directory from training run")
     tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
@@ -19,20 +23,16 @@ def runAnalysis(x_raw = ["Anush is honestly a great person"], y_test = None):
     FLAGS = tf.flags.FLAGS
     FLAGS._parse_flags()
 
-    #y_test = np.argmax(y_test, axis=1)
-    if not y_test:
-        y_test = np.full(len(x_raw), 1)
-
     # Map data into vocabulary
     vocab_path = os.path.join(FLAGS.checkpoint_dir, '..', "vocab")
     vocab_processor = learn.preprocessing.VocabularyProcessor.restore(vocab_path)
     x_test = np.array(list(vocab_processor.transform(x_raw)))
 
-    print("\nEvaluating...\n")
-
     # Evaluation
     checkpoint_file = tf.train.latest_checkpoint(FLAGS.checkpoint_dir)
     graph = tf.Graph()
+    all_predictions = []
+
     with graph.as_default():
         session_conf = tf.ConfigProto(
             allow_soft_placement=FLAGS.allow_soft_placement,
@@ -54,27 +54,20 @@ def runAnalysis(x_raw = ["Anush is honestly a great person"], y_test = None):
             # Generate batches for one epoch
             batches = data_helpers.batch_iter(list(x_test), FLAGS.batch_size, 1, shuffle=False)
 
-            # Collect the predictions here
-            all_predictions = []
-
             for x_test_batch in batches:
                 batch_predictions = sess.run(predictions, {input_x: x_test_batch, dropout_keep_prob: 1.0})
                 all_predictions = np.concatenate([all_predictions, batch_predictions])
 
-    # Print accuracy if y_test is defined
     if y_test is not None:
         correct_predictions = float(sum(all_predictions == y_test))
         print("Total number of test examples: {}".format(len(y_test)))
         print("Accuracy: {:g}".format(correct_predictions / float(len(y_test))))
 
+    printAnalysis(all_predictions)
+
     # Save the evaluation to a csv
     predictions_human_readable = np.column_stack((np.array(x_raw), all_predictions))
-    print(predictions_human_readable)
     out_path = os.path.join(FLAGS.checkpoint_dir, "..", "prediction.csv")
-    print("Saving evaluation to {0}".format(out_path))
+    #print("Saving evaluation to {0}".format(out_path))
     with open(out_path, 'w') as f:
         csv.writer(f).writerows(predictions_human_readable)
-
-
-def tempPrint(printStatement):
-    print(printStatement)
