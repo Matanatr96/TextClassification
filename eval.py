@@ -18,7 +18,8 @@ class TwitterAnalysis:
 
     def printAnalysis(self, predictions):
         average = np.mean(predictions)
-        print('Average Sentiment Score: {}'.format(average))
+        print('\n\nAverage Sentiment Score: {}'.format(average))
+        print('Turns out people dont like "{}". Who Knew'.format(self.hashtag))
 
     def runAnalysis(self, x_raw = None, y_test = None):
         tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
