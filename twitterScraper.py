@@ -1,17 +1,19 @@
 from twitterscraper import query_tweets
 import eval
+import sys
+import numpy as np
 
 
-# for tweet in query_tweets("Trump", 10)[:10]:
-# 	print(tweet.text)
-
-
-def runEval(evaluation):
-    eval.runAnalysis()
-    eval.tempPrint(evaluation)
+def formatText(text):
+    text = text.encode('utf-8', errors='ignore')
+    return text.decode('utf-8')
 
 
 if __name__ == "__main__":
-    #runEval('twitterScraper.py')
-    for tweet in query_tweets("Trump", 10)[:10]:
-        print(tweet.text)
+    tweets = []
+    print('Running Eval...')
+
+    for tweet in query_tweets("Trump", 100)[:100]:
+        tweets.append(format(tweet.text))
+
+    eval.runAnalysis(tweets)

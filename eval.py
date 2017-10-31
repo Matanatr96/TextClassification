@@ -21,7 +21,7 @@ def runAnalysis(x_raw = ["Anush is honestly a great person"], y_test = None):
 
     #y_test = np.argmax(y_test, axis=1)
     if not y_test:
-        y_test = [1]
+        y_test = np.full(len(x_raw), 1)
 
     # Map data into vocabulary
     vocab_path = os.path.join(FLAGS.checkpoint_dir, '..', "vocab")
@@ -69,6 +69,7 @@ def runAnalysis(x_raw = ["Anush is honestly a great person"], y_test = None):
 
     # Save the evaluation to a csv
     predictions_human_readable = np.column_stack((np.array(x_raw), all_predictions))
+    print(predictions_human_readable)
     out_path = os.path.join(FLAGS.checkpoint_dir, "..", "prediction.csv")
     print("Saving evaluation to {0}".format(out_path))
     with open(out_path, 'w') as f:
