@@ -19,9 +19,12 @@ class TwitterAnalysis:
     def printAnalysis(self, predictions):
         average = np.mean(predictions)
         print('\n\nAverage Sentiment Score: {}'.format(average))
-        print('Turns out people dont like "{}". Who Knew'.format(self.hashtag))
+        if average > .5:
+            print('Turns out people like "{}". Who Knew'.format(self.hashtag))
+        else:
+            print('Turns out people dont like "{}". Who Knew'.format(self.hashtag))
 
-    def runAnalysis(self, x_raw = None, y_test = None):
+    def runAnalysis(self, x_raw=None, y_test=None):
         tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
         tf.flags.DEFINE_string("checkpoint_dir", ".\\runs\\1508178059\\checkpoints", "Checkpoint directory from training run")
         tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
@@ -33,9 +36,7 @@ class TwitterAnalysis:
         if not x_raw:
             x_raw = self.data
         if not y_test:
-            print('No test prediction')
-
-        #print("xraw: {}".format(x_raw))
+            print('No test prediction exists')
 
         # Map data into vocabulary
         vocab_path = os.path.join(FLAGS.checkpoint_dir, '..', "vocab")

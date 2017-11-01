@@ -6,8 +6,8 @@ import numpy as np
 
 
 def formatText(text):
-    text = text.encode('utf-8', errors='ignore')
-    return text.decode('utf-8')
+    text = text.encode('ascii', 'ignore')
+    return text.decode('ascii', 'ignore')
 
 def parseArguments():
     parser = argparse.ArgumentParser(description='Analyze Tweets')
@@ -26,10 +26,10 @@ if __name__ == "__main__":
     number, hashtag = parseArguments()
 
     for tweet in query_tweets(hashtag, number)[:number]:
-        tweets.append(format(tweet.text))
+        Text = tweet.text
+        tweets.append(formatText(Text))
 
     # y_test = np.full(len(tweets), 1)
 
     twitterAnalysis = eval.TwitterAnalysis(tweets, hashtag)
     twitterAnalysis.runAnalysis()
-
